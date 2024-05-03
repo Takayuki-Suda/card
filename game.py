@@ -12,7 +12,7 @@ class CardGameGUI:
         height = self.master.winfo_screenheight()
         font_size = min(width, height) // 30  # フォントサイズを設定
 
-        # ウィジェットのスタイルを定義
+        # ウィジェットのスタイルを定義あああ
         style = ttk.Style()
         style.configure("Cool.TButton", background="#007bff", foreground="white", font=("Helvetica", font_size))
 
