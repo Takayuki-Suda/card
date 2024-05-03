@@ -1,6 +1,7 @@
 import random
 import tkinter as tk
 from tkinter import ttk, messagebox
+from PIL import Image, ImageTk
 
 class CardGameGUI:
     def __init__(self, master):
@@ -48,12 +49,10 @@ class GameWindow:
                               font=("Helvetica", font_size), bg="#333333", fg="white")
         self.label.pack(pady=20)
 
-        
-
         self.player2_hand_label = tk.Label(master, text="AIの手札:", font=("Helvetica", font_size), bg="#333333", fg="white")
         self.player2_hand_label.pack()
 
-        self.player2_hand_display = tk.Label(master, text=", ".join(self.player2_hand), font=("Helvetica", font_size), bg="#333333", fg="white")
+        self.player2_hand_display = tk.Label(master, font=("Helvetica", font_size), bg="#333333", fg="white")
         self.player2_hand_display.pack()
 
         self.button_frame = tk.Frame(self.master, bg="#333333")
@@ -65,6 +64,7 @@ class GameWindow:
         self.next_round_button = ttk.Button(self.master, text="次のラウンド", command=self.reset_round, style="Cool.TButton")
         self.next_round_button.pack()
 
+        self.card_images = [Image.open(f"aquma_0{i}.png") for i in range(1, 6)]
         self.show_card_buttons()
 
     def show_card_buttons(self):
@@ -74,9 +74,19 @@ class GameWindow:
         card_labels = ["1", "2", "3", "4", "5"]
         for card_label in card_labels:
             if card_label in self.player1_hand:
-                button = ttk.Button(self.button_frame, text=card_label, command=lambda label=card_label: self.choose_card(label),
-                                    style="Cool.TButton")
-                button.pack(side=tk.LEFT, padx=5)
+                # 画像の読み込み
+                img = Image.open(f"aquma_0{card_label}.png")
+                # 画像のサイズを変更
+                img = img.resize((200, 400))  # 例: 幅50ピクセル、高さ100ピクセルに変更
+                # 画像の背景色を透明に設定
+                img = img.convert("RGBA")
+                img = ImageTk.PhotoImage(img)
+
+                label = tk.Label(self.button_frame, image=img, bg="#333333")
+                label.image = img
+                label.bind("<Button-1>", lambda event, card=card_label: self.choose_card(card))
+                label.pack(side=tk.LEFT, padx=5)
+
 
     def choose_card(self, card_label):
         if self.player1_card is None:
