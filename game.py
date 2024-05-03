@@ -61,11 +61,22 @@ class GameWindow:
         self.result_label = tk.Label(master, text="", font=("Helvetica", 14), bg="#333333", fg="white")
         self.result_label.pack(pady=20)
 
-        self.next_round_button = ttk.Button(self.master, text="次のラウンド", command=self.reset_round, style="Cool.TButton")
-        self.next_round_button.pack()
-
         self.card_images = [Image.open(f"aquma_0{i}.png") for i in range(1, 6)]
         self.show_card_buttons()
+
+        # 「次のラウンド」ボタンの上に画像を表示するラベルを作成
+        img_hand = Image.open("hand_dia.png")
+        img_hand = img_hand.resize((200, 200))  # 必要に応じてサイズを調整
+        img_hand = img_hand.convert("RGBA")
+        img_hand = ImageTk.PhotoImage(img_hand)
+
+        self.hand_label = tk.Label(master, image=img_hand, bg="#333333")
+        self.hand_label.image = img_hand
+        self.hand_label.pack()
+
+        # 「次のラウンド」ボタンを作成
+        self.next_round_button = ttk.Button(self.master, text="次のラウンド", command=self.reset_round, style="Cool.TButton")
+        self.next_round_button.pack()
 
     def show_card_buttons(self):
         for widget in self.button_frame.winfo_children():
@@ -77,7 +88,7 @@ class GameWindow:
                 # 画像の読み込み
                 img = Image.open(f"aquma_0{card_label}.png")
                 # 画像のサイズを変更
-                img = img.resize((200, 400))  # 例: 幅50ピクセル、高さ100ピクセルに変更
+                img = img.resize((140, 210))  # 例: 幅150ピクセル、高さ250ピクセルに変更
                 # 画像の背景色を透明に設定
                 img = img.convert("RGBA")
                 img = ImageTk.PhotoImage(img)
