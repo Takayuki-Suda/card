@@ -61,11 +61,10 @@ class GameWindow:
         self.result_label = tk.Label(master, text="", font=("Helvetica", 14), bg="#333333", fg="white")
         self.result_label.pack(pady=20)
 
-        self.card_images = [Image.open(f"aquma_0{i}.png") for i in range(1, 6)]
         self.show_card_buttons()
 
         # 「次のラウンド」ボタンの上に画像を表示するラベルを作成
-        img_hand = Image.open("hand_dia.png")
+        img_hand = Image.open("img/hand_dia.png")
         img_hand = img_hand.resize((200, 200))  # 必要に応じてサイズを調整
         img_hand = img_hand.convert("RGBA")
         img_hand = ImageTk.PhotoImage(img_hand)
