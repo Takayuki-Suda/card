@@ -66,7 +66,7 @@ class GameWindow:
 
         # 「次のラウンド」ボタンの上に画像を表示するラベルを作成
         img_hand = Image.open("hand_dia.png")
-        img_hand = img_hand.resize((240, 350))  # 必要に応じてサイズを調整
+        img_hand = img_hand.resize((200, 200))  # 必要に応じてサイズを調整
         img_hand = img_hand.convert("RGBA")
         img_hand = ImageTk.PhotoImage(img_hand)
 
@@ -88,7 +88,7 @@ class GameWindow:
                 # 画像の読み込み
                 img = Image.open(f"img/card{card_label}.png")
                 # 画像のサイズを変更
-                img = img.resize((140, 210))  # 例: 幅150ピクセル、高さ250ピクセルに変更
+                img = img.resize((240, 350))  # 例: 幅150ピクセル、高さ250ピクセルに変更
                 # 画像の背景色を透明に設定
                 img = img.convert("RGBA")
                 img = ImageTk.PhotoImage(img)
