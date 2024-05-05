@@ -43,8 +43,6 @@ class GameWindow:
         self.player1_coins = 0
         self.player2_coins = 0
 
-        self.player1_score = 0
-        self.player2_score = 0
         self.player1_card = None
         self.player2_card = None
         self.round_count = 0
@@ -137,12 +135,10 @@ class GameWindow:
 
         result = "引き分けです！"
         if int(self.player1_card) > int(self.player2_card):
-            self.player1_score += 1
             result = "プレイヤー1がこのラウンドを勝ちました！"
             self.player1_coins += self.coin_gain
             self.total_coins -= self.coin_gain
         elif int(self.player2_card) > int(self.player1_card):
-            self.player2_score += 1
             result = "AIがこのラウンドを勝ちました！"
             self.player2_coins += self.coin_gain
             self.total_coins -= self.coin_gain
@@ -162,8 +158,17 @@ class GameWindow:
             self.update_coin_gain()
 
     def end_game(self):
-        winner = "プレイヤー1" if self.player1_score > self.player2_score else "AI" if self.player2_score > self.player1_score else "引き分け"
-        messagebox.showinfo("ゲーム終了", f"プレイヤー1の得点: {self.player1_score}\nAIの得点: {self.player2_score}\n{winner}の勝利！\n\nプレイヤーの総金貨: {self.player1_coins}/100枚\nAIの総金貨: {self.player2_coins}/100枚")
+        if self.player1_coins > self.player2_coins:
+            winner = "プレイヤー1の勝利！"
+        elif self.player1_coins < self.player2_coins:
+            winner = "AIの勝利！"
+        else :
+            winner = "引き分け"
+        messagebox.showinfo("ゲーム終了", 
+                            "金貨枚数で判定します。\n\n"
+                            f"{winner}\n\n"
+                            f"プレイヤーの総金貨: {self.player1_coins}/100枚\n"
+                            f"AIの総金貨: {self.player2_coins}/100枚")
         self.master.destroy()
 
     def update_coins_display(self):
