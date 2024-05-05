@@ -96,7 +96,7 @@ class GameWindow:
 
         # 「次のラウンド」ボタンを作成
         self.next_round_button = ttk.Button(self.master, text="次のラウンド", command=self.reset_round, style="Cool.TButton")
-        self.next_round_button.pack()
+        self.next_round_button.pack_forget()
 
         self.update_ai_hand()
 
@@ -145,6 +145,7 @@ class GameWindow:
 
         self.result_label.config(text=result)
         self.update_coins_display()
+        self.next_round_button.pack()
 
         if self.round_count == 5:
             self.end_game()  # ラウンドが5回に達したらゲーム終了
@@ -156,6 +157,7 @@ class GameWindow:
         if self.round_count < 5:
             self.update_ai_hand()
             self.update_coin_gain()
+            self.next_round_button.pack_forget()
 
     def end_game(self):
         if self.player1_coins > self.player2_coins:
@@ -167,12 +169,12 @@ class GameWindow:
         messagebox.showinfo("ゲーム終了", 
                             "金貨枚数で判定します。\n\n"
                             f"{winner}\n\n"
-                            f"プレイヤーの総金貨: {self.player1_coins}/100枚\n"
+                            f"プレイヤー1の総金貨: {self.player1_coins}/100枚\n"
                             f"AIの総金貨: {self.player2_coins}/100枚")
         self.master.destroy()
 
     def update_coins_display(self):
-        self.player1_coins_label.config(text=f"プレイヤーの金貨: {self.player1_coins}枚")
+        self.player1_coins_label.config(text=f"プレイヤー1の金貨: {self.player1_coins}枚")
         self.total_coins_label.config(text=f"総金貨: {self.total_coins}枚")
         self.player2_coins_label.config(text=f"AIの金貨: {self.player2_coins}枚")
 
