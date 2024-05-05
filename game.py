@@ -38,6 +38,7 @@ class GameWindow:
         font_size = 16
 
         self.total_coins = 100
+        self.coin_gain = 0
 
         self.player1_coins = 0
         self.player2_coins = 0
@@ -66,7 +67,8 @@ class GameWindow:
         self.player2_coins_label = tk.Label(self.coins_frame, text=f"AIの金貨: {self.player2_coins}枚", font=("Helvetica", font_size), bg="#333333", fg="white", anchor="w")
         self.player2_coins_label.pack(padx=20, pady=5, side="left")
 
-        self.coin_gain_label = tk.Label(master, text="", font=("Helvetica", font_size), bg="#333333", fg="white")
+        self.coin_gain = random.randint(1, 5)
+        self.coin_gain_label = tk.Label(master, text=f"今回獲得できる金貨: {self.coin_gain}枚", font=("Helvetica", font_size), bg="#333333", fg="white")
         self.coin_gain_label.pack()
 
         self.player2_hand_label = tk.Label(master, text="AIの手札:", font=("Helvetica", font_size), bg="#333333", fg="white")
@@ -133,20 +135,17 @@ class GameWindow:
         self.round_count += 1
         self.player2_card = random.choice(self.player2_hand)
 
-        coin_gain = random.randint(1, 5)
-
-        self.coin_gain_label.config(text=f"今回獲得できる金貨: {coin_gain}枚")
         result = "引き分けです！"
         if int(self.player1_card) > int(self.player2_card):
             self.player1_score += 1
             result = "プレイヤー1がこのラウンドを勝ちました！"
-            self.player1_coins += coin_gain
-            self.total_coins -= coin_gain
+            self.player1_coins += self.coin_gain
+            self.total_coins -= self.coin_gain
         elif int(self.player2_card) > int(self.player1_card):
             self.player2_score += 1
             result = "AIがこのラウンドを勝ちました！"
-            self.player2_coins += coin_gain
-            self.total_coins -= coin_gain
+            self.player2_coins += self.coin_gain
+            self.total_coins -= self.coin_gain
 
         self.result_label.config(text=result)
         self.update_coins_display()
@@ -160,6 +159,7 @@ class GameWindow:
         self.player1_card = None
         if self.round_count < 5:
             self.update_ai_hand()
+            self.update_coin_gain()
 
     def end_game(self):
         winner = "プレイヤー1" if self.player1_score > self.player2_score else "AI" if self.player2_score > self.player1_score else "引き分け"
@@ -175,6 +175,10 @@ class GameWindow:
         if self.player2_card in self.player2_hand:
             self.player2_hand.remove(self.player2_card)
         self.player2_hand_display.config(text=", ".join(self.player2_hand))
+
+    def update_coin_gain(self):
+        self.coin_gain = random.randint(1, 5)
+        self.coin_gain_label.config(text=f"今回獲得できる金貨: {self.coin_gain}枚")        
 
     def create_modal_window(self, event=None):
         modal_window = tk.Toplevel(self.master)
