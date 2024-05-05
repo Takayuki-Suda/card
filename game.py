@@ -2,6 +2,7 @@ import random
 import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
+from time import strftime
 
 class CardGameGUI:
     def __init__(self, master):
@@ -24,10 +25,17 @@ class CardGameGUI:
         self.play_button = ttk.Button(master, text="プレイ", command=self.play_game, style="Cool.TButton")
         self.play_button.pack()
 
+        # ゲーム終了ボタンを追加
+        self.quit_button = ttk.Button(master, text="ゲームを終了", command=self.quit_game, style="Cool.TButton")
+        self.quit_button.pack()
+
     def play_game(self):
         self.master.withdraw()
         game_window = tk.Toplevel(self.master)
         GameWindow(game_window)
+
+    def quit_game(self):
+        self.master.destroy()
 
 class GameWindow:
     def __init__(self, master):
@@ -52,6 +60,12 @@ class GameWindow:
         self.label = tk.Label(master, text="各プレイヤーは交互にカードをプレイします。\nカードの最も高い数字を持ったプレイヤーがラウンドに勝ちます。",
                               font=("Helvetica", font_size), bg="#333333", fg="white")
         self.label.pack(pady=20)
+
+        # 時計を表示するためのラベルを作成
+        self.clock_label = tk.Label(master, font=("Helvetica", font_size), bg="#333333", fg="white")
+        self.clock_label.pack(pady=0, side="left")
+        # 時計を更新するためにupdate_timeメソッドを呼び出す
+        self.update_time()
 
         self.coins_frame = tk.Frame(master, bg="#333333")
         self.coins_frame.pack()
@@ -83,6 +97,12 @@ class GameWindow:
 
         self.card_images = [Image.open(f"img/card{i}.png") for i in range(1, 6)]
         self.show_card_buttons()
+
+        # プレイヤーとAIのカード表示用のラベルを作成
+        self.player1_card_label = tk.Label(master, bg="#333333")
+        self.player1_card_label.pack(side=tk.LEFT, padx=100, pady=20)
+        self.player2_card_label = tk.Label(master, bg="#333333")
+        self.player2_card_label.pack(side=tk.RIGHT, padx=100, pady=20)
 
         # 「次のラウンド」ボタンの上に画像を表示するラベルを作成
         img_hand = Image.open("img/hand_dia.png")
@@ -147,8 +167,39 @@ class GameWindow:
         self.update_coins_display()
         self.next_round_button.pack()
 
+        # カードの表示
+        self.show_cards()
+
         if self.round_count == 5:
             self.end_game()  # ラウンドが5回に達したらゲーム終了
+
+    def show_cards(self):
+        # プレイヤーのカードを表示
+        player1_card_img = Image.open(f"img/card{self.player1_card}.png")
+        player1_card_img = player1_card_img.resize((140, 210))
+        player1_card_img = player1_card_img.convert("RGBA")
+        player1_card_img = ImageTk.PhotoImage(player1_card_img)
+        self.player1_card_label.configure(image=player1_card_img)
+        self.player1_card_label.image = player1_card_img
+
+        # AIのカードを表示
+        player2_card_img = Image.open(f"img/card{self.player2_card}.png")
+        player2_card_img = player2_card_img.resize((140, 210))
+        player2_card_img = player2_card_img.convert("RGBA")
+        player2_card_img = ImageTk.PhotoImage(player2_card_img)
+        self.player2_card_label.configure(image=player2_card_img)
+        self.player2_card_label.image = player2_card_img
+
+        # カードの勝敗を判定
+        if int(self.player1_card) > int(self.player2_card):
+            self.shatter_card(self.player2_card_label)
+        elif int(self.player2_card) > int(self.player1_card):
+            self.shatter_card(self.player1_card_label)
+
+    def shatter_card(self, card_label):
+        # カードが割れるアニメーションを追加
+        # 今回は割れるアニメーションは省略しています
+        pass
 
     def reset_round(self, event=None):
         self.result_label.config(text="")
@@ -196,6 +247,12 @@ class GameWindow:
 
         end_game_button = tk.Button(modal_window, text="ゲームを終了", command=self.end_game)
         end_game_button.pack(pady=10)
+
+    def update_time(self):
+        current_time = strftime('%H:%M:%S %p')  # 現在時刻を取得
+        self.clock_label.config(text=current_time)  # ラベルに時刻を表示
+        self.clock_label.after(1000, self.update_time)  # 1秒ごとに時刻を更新
+
 
 def main():
     root = tk.Tk()
