@@ -98,6 +98,8 @@ class GameWindow:
         self.next_round_button = ttk.Button(self.master, text="次のラウンド", command=self.reset_round, style="Cool.TButton")
         self.next_round_button.pack()
 
+        self.update_ai_hand()
+
         self.master.bind("<Escape>", self.create_modal_window)
 
     def show_card_buttons(self):
