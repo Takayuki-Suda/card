@@ -32,7 +32,15 @@ class CardGameGUI:
     def play_game(self):
         self.master.withdraw()
         game_window = tk.Toplevel(self.master)
+        game_window.title("ゲーム")
+        game_window.attributes('-fullscreen', True)
+        game_window.configure(bg="#333333")
+        game_window.focus_force()  # ゲームウィンドウにフォーカスを当てる
         GameWindow(game_window)
+
+        # ゲームウィンドウを作成した後にエスケープキーをバインド
+        game_window.bind("<Escape>", self.create_modal_window)
+
 
     def quit_game(self):
         self.master.destroy()
@@ -174,28 +182,40 @@ class GameWindow:
             self.end_game()  # ラウンドが5回に達したらゲーム終了
 
     def show_cards(self):
-        # プレイヤーのカードを表示
+        # プレイヤーのカードはそのまま表示
         player1_card_img = Image.open(f"img/card{self.player1_card}.png")
         player1_card_img = player1_card_img.resize((140, 210))
         player1_card_img = player1_card_img.convert("RGBA")
-        player1_card_img = ImageTk.PhotoImage(player1_card_img)
-        self.player1_card_label.configure(image=player1_card_img)
-        self.player1_card_label.image = player1_card_img
+      
 
-        # AIのカードを表示
+        # AIのカードの画像を読み込み、透明度を変更可能な形式に変換
         player2_card_img = Image.open(f"img/card{self.player2_card}.png")
         player2_card_img = player2_card_img.resize((140, 210))
         player2_card_img = player2_card_img.convert("RGBA")
-        player2_card_img = ImageTk.PhotoImage(player2_card_img)
-        self.player2_card_label.configure(image=player2_card_img)
-        self.player2_card_label.image = player2_card_img
 
         # カードの勝敗を判定
         if int(self.player1_card) > int(self.player2_card):
             self.shatter_card(self.player2_card_label)
+            # フェードアウトのアニメーションを実行
+            self.fade_out(player2_card_img, self.player2_card_label)
         elif int(self.player2_card) > int(self.player1_card):
             self.shatter_card(self.player1_card_label)
+            # フェードアウトのアニメーションを実行
+            self.fade_out(player1_card_img, self.player1_card_label)
 
+
+    def fade_out(self, image, label):
+        for alpha in range(255, -1, -5):
+            image.putalpha(alpha)  # 透明度を設定
+            photo_image = ImageTk.PhotoImage(image)
+            label.configure(image=photo_image)
+            label.image = photo_image
+            label.update_idletasks()  # 更新された画像を表示
+            self.master.after(50)  # 50ミリ秒待ってから次の透明度に更新
+
+        # 透明度が0になったら画像を削除
+        label.configure(image="")
+        label.image = None
     def shatter_card(self, card_label):
         # カードが割れるアニメーションを追加
         # 今回は割れるアニメーションは省略しています
