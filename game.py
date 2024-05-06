@@ -32,15 +32,7 @@ class CardGameGUI:
     def play_game(self):
         self.master.withdraw()
         game_window = tk.Toplevel(self.master)
-        game_window.title("ゲーム")
-        game_window.attributes('-fullscreen', True)
-        game_window.configure(bg="#333333")
-        game_window.focus_force()  # ゲームウィンドウにフォーカスを当てる
         GameWindow(game_window)
-
-        # ゲームウィンドウを作成した後にエスケープキーをバインド
-        game_window.bind("<Escape>", self.create_modal_window)
-
 
     def quit_game(self):
         self.master.destroy()
@@ -154,8 +146,9 @@ class GameWindow:
         if self.player1_card is None:
             self.player1_card = card_label
             self.player1_hand.remove(card_label)  # 選択したカードをプレイヤーの手札から削除
-            self.show_card_buttons()  # カードを選択した後にボタンを再描画
             self.play_round()
+            if self.round_count == 5:
+                self.end_game()  # ラウンドが5回に達したらゲーム終了
 
     def play_round(self):
         self.round_count += 1
@@ -171,22 +164,18 @@ class GameWindow:
             self.player2_coins += self.coin_gain
             self.total_coins -= self.coin_gain
 
+        # カードの表示
+        self.show_cards()
+
         self.result_label.config(text=result)
         self.update_coins_display()
         self.next_round_button.pack()
 
-        # カードの表示
-        self.show_cards()
-
-        if self.round_count == 5:
-            self.end_game()  # ラウンドが5回に達したらゲーム終了
-
     def show_cards(self):
-        # プレイヤーのカードはそのまま表示
+        # プレイヤーのカードの画像を読み込み、透明度を変更可能な形式に変換
         player1_card_img = Image.open(f"img/card{self.player1_card}.png")
         player1_card_img = player1_card_img.resize((140, 210))
         player1_card_img = player1_card_img.convert("RGBA")
-      
 
         # AIのカードの画像を読み込み、透明度を変更可能な形式に変換
         player2_card_img = Image.open(f"img/card{self.player2_card}.png")
@@ -195,40 +184,58 @@ class GameWindow:
 
         # カードの勝敗を判定
         if int(self.player1_card) > int(self.player2_card):
-            self.shatter_card(self.player2_card_label)
             # フェードアウトのアニメーションを実行
-            self.fade_out(player2_card_img, self.player2_card_label)
+            self.shatter_card(player1_card_img, player2_card_img, 1)
         elif int(self.player2_card) > int(self.player1_card):
-            self.shatter_card(self.player1_card_label)
             # フェードアウトのアニメーションを実行
-            self.fade_out(player1_card_img, self.player1_card_label)
+            self.shatter_card(player1_card_img, player2_card_img, 2)
 
-
-    def fade_out(self, image, label):
-        for alpha in range(255, -1, -5):
-            image.putalpha(alpha)  # 透明度を設定
-            photo_image = ImageTk.PhotoImage(image)
-            label.configure(image=photo_image)
-            label.image = photo_image
-            label.update_idletasks()  # 更新された画像を表示
-            self.master.after(50)  # 50ミリ秒待ってから次の透明度に更新
-
-        # 透明度が0になったら画像を削除
-        label.configure(image="")
-        label.image = None
-    def shatter_card(self, card_label):
+    def shatter_card(self, image1, image2, flg):
         # カードが割れるアニメーションを追加
         # 今回は割れるアニメーションは省略しています
-        pass
+        if flg == 1:
+            player2_card_img = ImageTk.PhotoImage(image2)
+            self.player2_card_label.configure(image=player2_card_img)
+            self.player2_card_label.image = player2_card_img
+            for alpha in range(255, -1, -5):
+                image1.putalpha(alpha)  # 透明度を設定
+                photo_image = ImageTk.PhotoImage(image1)
+                self.player1_card_label.configure(image=photo_image)
+                self.player1_card_label.image = photo_image
+                self.player1_card_label.update_idletasks()  # 更新された画像を表示
+                self.player1_card_label.after(50)  # 50ミリ秒待ってから次の透明度に更新
+            # 透明度が0になったら画像を削除
+            self.player1_card_label.configure(image="")
+            self.player1_card_label.image = None
+
+        elif flg == 2:
+            player1_card_img = ImageTk.PhotoImage(image1)
+            self.player1_card_label.configure(image=player1_card_img)
+            self.player1_card_label.image = player1_card_img
+            for alpha in range(255, -1, -5):
+                image2.putalpha(alpha)  # 透明度を設定
+                photo_image = ImageTk.PhotoImage(image2)
+                self.player2_card_label.configure(image=photo_image)
+                self.player2_card_label.image = photo_image
+                self.player2_card_label.update_idletasks()  # 更新された画像を表示
+                self.player2_card_label.after(50)  # 50ミリ秒待ってから次の透明度に更新
+            # 透明度が0になったら画像を削除
+            self.player2_card_label.configure(image="")
+            self.player2_card_label.image = None
 
     def reset_round(self, event=None):
         self.result_label.config(text="")
         self.coin_gain_label.config(text="")
         self.player1_card = None
         if self.round_count < 5:
+            self.show_card_buttons()  # カードを選択した後にボタンを再描画
             self.update_ai_hand()
             self.update_coin_gain()
             self.next_round_button.pack_forget()
+            self.player1_card_label.configure(image="")
+            self.player1_card_label.image = None
+            self.player2_card_label.configure(image="")
+            self.player2_card_label.image = None
 
     def end_game(self):
         if self.player1_coins > self.player2_coins:
