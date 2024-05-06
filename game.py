@@ -32,6 +32,7 @@ class CardGameGUI:
     def play_game(self):
         self.master.withdraw()
         game_window = tk.Toplevel(self.master)
+        game_window.focus_force()  # ゲームウィンドウにフォーカスを当てる
         GameWindow(game_window)
 
     def quit_game(self):
