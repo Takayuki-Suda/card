@@ -99,6 +99,12 @@ class GameWindow:
         self.card_images = [Image.open(f"img/card{i}.png") for i in range(1, 6)]
         self.show_card_buttons()
 
+        # プレイヤーとAIのコイン画像の表示
+        self.player1_coins_img_label = tk.Label(master, bg="#333333")
+        self.player1_coins_img_label.place(x=1260, y=950)
+        self.player2_coins_img_label = tk.Label(master, bg="#333333")
+        self.player2_coins_img_label.place(x=350, y=0)
+        
         # プレイヤーとAIのカード表示用のラベルを作成
         self.player1_card_label = tk.Label(master, bg="#333333")
         self.player1_card_label.pack(side=tk.LEFT, padx=100, pady=20)
@@ -122,6 +128,12 @@ class GameWindow:
         self.update_ai_hand()
 
         self.master.bind("<Escape>", self.create_modal_window)
+        
+        # Label上で<Motion>イベント発生時、
+        # show_positionを実行するように設定
+        self.mouse_pos = tk.Label(self.master, text=f"", font=("Helvetica", font_size), bg="#333333", fg="white")
+        self.mouse_pos.place(x=0, y=0)
+        self.master.bind("<Motion>", self.show_position)
 
     def show_card_buttons(self):
         for widget in self.button_frame.winfo_children():
@@ -232,6 +244,7 @@ class GameWindow:
             self.show_card_buttons()  # カードを選択した後にボタンを再描画
             self.update_ai_hand()
             self.update_coin_gain()
+            self.update_coin_img_display()
             self.next_round_button.pack_forget()
             self.player1_card_label.configure(image="")
             self.player1_card_label.image = None
@@ -262,6 +275,47 @@ class GameWindow:
             self.player2_hand.remove(self.player2_card)
         self.player2_hand_display.config(text=", ".join(self.player2_hand))
 
+    def update_coin_img_display(self):
+
+        # プレイヤー1のコイン
+        if(self.player1_coins >=1):
+            if self.player1_coins >= 1 and self.player1_coins < 5:
+                player1_img = Image.open("img/coin_back.png")
+                player1_img = player1_img.resize((100, 100))
+                player1_img = player1_img.convert("RGBA")     
+            elif self.player1_coins >= 5 and self.player1_coins < 10 :
+                player1_img = Image.open("img/coin_5piece.png")
+                player1_img = player1_img.resize((100, 100))
+                player1_img = player1_img.convert("RGBA")
+            else :
+                player1_img = Image.open("img/coin_10piece.png")
+                player1_img = player1_img.resize((100, 100))
+                player1_img = player1_img.convert("RGBA")
+            photo_image1 = ImageTk.PhotoImage(player1_img)
+            self.player1_coins_img_label.configure(image=photo_image1)
+            self.player1_coins_img_label.image = photo_image1
+            self.player1_coins_img_label.update_idletasks()  # 更新された画像を表示
+
+        # AIのコイン
+        if(self.player2_coins >=1):
+            if self.player2_coins >= 1 and self.player2_coins < 5:
+                player2_img = Image.open("img/coin_back.png")
+                player2_img = player2_img.resize((100, 100))
+                player2_img = player2_img.convert("RGBA")     
+            elif self.player2_coins >= 5 and self.player2_coins < 10 :
+                player2_img = Image.open("img/coin_5piece.png")
+                player2_img = player2_img.resize((100, 100))
+                player2_img = player2_img.convert("RGBA")
+            else :
+                player2_img = Image.open("img/coin_10piece.png")
+                player2_img = player2_img.resize((100, 100))
+                player2_img = player2_img.convert("RGBA")
+            photo_image2 = ImageTk.PhotoImage(player2_img)
+            self.player2_coins_img_label.configure(image=photo_image2)
+            self.player2_coins_img_label.image = photo_image2
+            self.player2_coins_img_label.update_idletasks()  # 更新された画像を表示
+        
+
     def update_coin_gain(self):
         self.coin_gain = random.randint(1, 5)
         self.coin_gain_label.config(text=f"今回獲得できる金貨: {self.coin_gain}枚")        
@@ -275,6 +329,10 @@ class GameWindow:
 
         end_game_button = tk.Button(modal_window, text="ゲームを終了", command=self.end_game)
         end_game_button.pack(pady=10)
+
+    def show_position(self, event):
+        x, y = event.x, event.y     # x,y座標取得
+        self.mouse_pos.config(text= str(x) + ", " + str(y))   # 座標表示
 
     def update_time(self):
         current_time = strftime('%H:%M:%S %p')  # 現在時刻を取得
