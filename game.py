@@ -207,21 +207,6 @@ class GameWindow:
         # カードが割れるアニメーションを追加
         # 今回は割れるアニメーションは省略しています
         if flg == 1:
-            player2_card_img = ImageTk.PhotoImage(image2)
-            self.player2_card_label.configure(image=player2_card_img)
-            self.player2_card_label.image = player2_card_img
-            for alpha in range(255, -1, -5):
-                image1.putalpha(alpha)  # 透明度を設定
-                photo_image = ImageTk.PhotoImage(image1)
-                self.player1_card_label.configure(image=photo_image)
-                self.player1_card_label.image = photo_image
-                self.player1_card_label.update_idletasks()  # 更新された画像を表示
-                self.player1_card_label.after(50)  # 50ミリ秒待ってから次の透明度に更新
-            # 透明度が0になったら画像を削除
-            self.player1_card_label.configure(image="")
-            self.player1_card_label.image = None
-
-        elif flg == 2:
             player1_card_img = ImageTk.PhotoImage(image1)
             self.player1_card_label.configure(image=player1_card_img)
             self.player1_card_label.image = player1_card_img
@@ -235,6 +220,21 @@ class GameWindow:
             # 透明度が0になったら画像を削除
             self.player2_card_label.configure(image="")
             self.player2_card_label.image = None
+
+        elif flg == 2:
+            player2_card_img = ImageTk.PhotoImage(image2)
+            self.player2_card_label.configure(image=player2_card_img)
+            self.player2_card_label.image = player2_card_img
+            for alpha in range(255, -1, -5):
+                image1.putalpha(alpha)  # 透明度を設定
+                photo_image = ImageTk.PhotoImage(image1)
+                self.player1_card_label.configure(image=photo_image)
+                self.player1_card_label.image = photo_image
+                self.player1_card_label.update_idletasks()  # 更新された画像を表示
+                self.player1_card_label.after(50)  # 50ミリ秒待ってから次の透明度に更新
+            # 透明度が0になったら画像を削除
+            self.player1_card_label.configure(image="")
+            self.player1_card_label.image = None
 
     def reset_round(self, event=None):
         self.result_label.config(text="")
