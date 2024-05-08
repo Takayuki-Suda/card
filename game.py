@@ -68,6 +68,16 @@ class GameWindow:
         # 時計を更新するためにupdate_timeメソッドを呼び出す
         self.update_time()
 
+        self.backGround_img = tk.Label(master, bg="#333333")
+        self.backGround_img.place(x=0, y=0)
+
+        backGround_img = Image.open("img/back.png")
+        backGround_img = backGround_img.resize((1920, 1080))
+        backGround_img = backGround_img.convert("RGBA")
+        photo_bk_image = ImageTk.PhotoImage(backGround_img)
+        self.backGround_img.configure(image=photo_bk_image)
+        self.backGround_img.image = photo_bk_image
+
         self.coins_frame = tk.Frame(master, bg="#333333")
         self.coins_frame.pack()
 
